@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Couples Honesty Test</title>
+<meta name="description" content="Who's messier? Who's funnier? Who's hotter? You both answer. Then find out if your versions of each other actually match.">
+<meta property="og:title" content="The Couples Honesty Test">
+<meta property="og:description" content="12 questions. Two answers. One uncomfortable truth.">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #FFFEF9;
+  --fg: #0D0D2B;
+  --pink: #FF2D55;
+  --pink-soft: rgba(255,45,85,0.10);
+  --yellow: #FFE600;
+  --yellow-soft: rgba(255,230,0,0.20);
+  --mint: #00C48C;
+  --mint-soft: rgba(0,196,140,0.12);
+  --card: #FFFFFF;
+  --muted: #9494A8;
+  --border: rgba(13,13,43,0.08);
+  --shadow: 0 4px 24px rgba(13,13,43,0.08);
+}
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Nunito', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow-x: hidden;
+}
+
+/* Decorative background dots */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(255,230,0,0.25) 0%, transparent 40%),
+    radial-gradient(circle at 85% 75%, rgba(255,45,85,0.12) 0%, transparent 40%);
+}
+
+#app { width: 100%; max-width: 500px; text-align: center; position: relative; z-index: 1; }
+
+.screen { opacity: 0; transform: translateY(14px); transition: opacity 0.3s ease, transform 0.3s ease; }
+.screen.visible { opacity: 1; transform: translateY(0); }
+
+/* HOME */
+.eyebrow {
+  display: inline-block;
+  background: var(--yellow);
+  color: var(--fg);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 100px;
+  margin-bottom: 20px;
+}
+.stat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(80px, 20vw, 130px);
+  line-height: 0.85;
+  color: var(--pink);
+  letter-spacing: -0.01em;
+}
+.stat-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: 10px;
+  margin-bottom: 6px;
+}
+h1 {
+  font-size: clamp(26px, 6vw, 38px);
+  font-weight: 900;
+  line-height: 1.15;
+  margin-bottom: 12px;
+  color: var(--fg);
+}
+.subtitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 36px;
+}
+.body-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+/* BUTTONS */
+.btn-primary {
+  display: block;
+  width: 100%;
+  padding: 18px 24px;
+  background: var(--pink);
+  border: none;
+  border-radius: 16px;
+  color: white;
+  font-size: 15px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.18s;
+  box-shadow: 0 4px 0 rgba(200,10,40,0.35);
+  position: relative;
+  top: 0;
+  margin-bottom: 10px;
+}
+.btn-primary:hover { background: #e82549; top: 2px; box-shadow: 0 2px 0 rgba(200,10,40,0.35); }
+.btn-primary:active { top: 4px; box-shadow: 0 0px 0 rgba(200,10,40,0.35); }
+
+.btn-secondary {
+  display: block;
+  width: 100%;
+  padding: 18px 24px;
+  background: var(--card);
+  border: 2.5px solid var(--border);
+  border-radius: 16px;
+  color: var(--fg);
+  font-size: 15px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.18s;
+  margin-bottom: 10px;
+}
+.btn-secondary:hover { border-color: var(--pink); color: var(--pink); background: var(--pink-soft); }
+
+.btn-ghost {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 12px;
+  text-align: center;
+  transition: color 0.18s;
+}
+.btn-ghost:hover { color: var(--fg); }
+
+/* PROGRESS */
+.progress-wrap { margin-bottom: 28px; }
+.progress-bar-bg {
+  height: 6px;
+  background: var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--pink);
+  border-radius: 10px;
+  transition: width 0.4s ease;
+}
+.progress-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  text-align: right;
+}
+
+/* QUESTION */
+.q-who-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--yellow);
+  color: var(--fg);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 100px;
+  margin-bottom: 20px;
+}
+.q-emoji {
+  font-size: clamp(36px, 8vw, 52px);
+  margin-bottom: 10px;
+  display: block;
+}
+.question-text {
+  font-size: clamp(22px, 5.5vw, 30px);
+  font-weight: 900;
+  line-height: 1.2;
+  color: var(--fg);
+  margin-bottom: 28px;
+}
+.answer-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 18px 22px;
+  background: var(--card);
+  border: 2.5px solid var(--border);
+  border-radius: 16px;
+  color: var(--fg);
+  font-size: 15px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s;
+  text-align: left;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
+}
+.answer-btn:hover { border-color: var(--pink); background: var(--pink-soft); transform: scale(1.01); }
+.answer-btn.selected {
+  background: var(--pink);
+  border-color: var(--pink);
+  color: white;
+  transform: scale(0.98);
+}
+.answer-letter {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(13,13,43,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  flex-shrink: 0;
+  transition: background 0.18s;
+}
+.answer-btn.selected .answer-letter { background: rgba(255,255,255,0.25); }
+.answer-btn-text { flex: 1; }
+
+/* SHARE SCREEN */
+.lock-icon { font-size: 52px; margin-bottom: 16px; display: block; }
+.share-card {
+  background: var(--card);
+  border: 2.5px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+.share-url {
+  font-size: 12px;
+  font-family: monospace;
+  color: var(--muted);
+  word-break: break-all;
+  user-select: all;
+  line-height: 1.7;
+}
+
+/* RESULTS */
+.result-badge {
+  display: inline-block;
+  background: var(--yellow);
+  color: var(--fg);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 100px;
+  margin-bottom: 12px;
+}
+.result-emoji { font-size: 64px; display: block; margin-bottom: 10px; }
+.result-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(44px, 12vw, 72px);
+  line-height: 1;
+  color: var(--pink);
+  margin-bottom: 4px;
+}
+.result-score {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+.activity-card {
+  background: var(--fg);
+  color: white;
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+.activity-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--yellow);
+  margin-bottom: 8px;
+}
+.activity-text {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: white;
+}
+.verdict-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  line-height: 1.65;
+  margin-bottom: 24px;
+}
+
+/* Q BREAKDOWN */
+.breakdown-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.q-result-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 24px; }
+.q-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 2px solid;
+}
+.q-chip.agree { background: var(--mint-soft); border-color: var(--mint); color: #00A876; }
+.q-chip.disagree { background: var(--pink-soft); border-color: rgba(255,45,85,0.3); color: var(--pink); }
+
+.results-actions { margin-top: 8px; }
+.results-actions .btn-primary { margin-bottom: 8px; }
+.results-actions .btn-secondary { margin-bottom: 8px; }
+
+#results-canvas { display: none; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<canvas id="results-canvas"></canvas>
+<script>
+const QUESTIONS = [
+  {id:1,  emoji:"💇", q:"Who has better hair?",                      a:"I do, and I know it",         b:"They do, no contest"},
+  {id:2,  emoji:"🪞", q:"Who takes longer to get ready?",            a:"Me. I'm why we're late.",      b:"Them. Zero question."},
+  {id:3,  emoji:"🧹", q:"Who's messier?",                            a:"Me. It's a problem.",          b:"Them. I've accepted it."},
+  {id:4,  emoji:"😂", q:"Who's funnier?",                            a:"Me. I'm hilarious.",           b:"Them. I laugh every day."},
+  {id:5,  emoji:"🚗", q:"Who's the worse driver?",                   a:"Me. I am a hazard.",           b:"Them. No further comment."},
+  {id:6,  emoji:"🎬", q:"Who cries more at movies?",                 a:"Me. Not ashamed.",             b:"Them. It's adorable."},
+  {id:7,  emoji:"🎵", q:"Who has better taste in music?",            a:"I do. Objectively.",           b:"They do. I'll admit it."},
+  {id:8,  emoji:"🧱", q:"Who's more stubborn?",                      a:"Me. I know. I know.",          b:"Them. Absolutely them."},
+  {id:9,  emoji:"🔥", q:"Who's hotter?",                             a:"Me. Be honest.",               b:"Them. It's not even close."},
+  {id:10, emoji:"📱", q:"Who texts back faster?",                    a:"Me. Always on it.",            b:"Them. Very responsive."},
+  {id:11, emoji:"🤧", q:"Who's a bigger baby when sick?",            a:"Me. I need soup and attention.",b:"Them. It's a whole production."},
+  {id:12, emoji:"🗣️", q:"Who usually wins arguments?",               a:"Me. I'm always right.",        b:"Them. I usually cave."},
+  {id:13, emoji:"💸", q:"Who spends more money on stupid stuff?",     a:"Me. I have a problem.",        b:"Them. Don't get me started."},
+  {id:14, emoji:"🍳", q:"Who's the better cook?",                     a:"Me. It's not close.",          b:"Them. I married up, culinarily."},
+  {id:15, emoji:"💔", q:"Who apologizes first after a fight?",        a:"Me. Always me.",               b:"Them. To their credit."},
+];
+
+// For "who" questions:
+// A picks 0 = "I do" = claiming Person A
+// A picks 1 = "They do" = claiming Person B
+// B picks 0 = "I do" = claiming Person B
+// B picks 1 = "They do" = claiming Person A
+// ALIGNED = both pointing at the same person = a[id] !== b[id]
+function isAligned(aVal, bVal) { return aVal !== bVal; }
+
+const RESULTS = [
+  {
+    min: 13,
+    name: "Twin Brains",
+    emoji: "🧠",
+    verdict: "You see each other with freaky clarity. Either you're deeply in tune or you've had all these arguments before and both know who won.",
+    activity: "Tonight's assignment: make a TikTok doing this quiz out loud. React to each other's answers in real time.",
+  },
+  {
+    min: 9,
+    name: "Power Couple",
+    emoji: "⚡",
+    verdict: "You know each other well. The places you didn't agree? Those are just the conversations you haven't had yet. Have them.",
+    activity: "Tonight's assignment: send each other a voice note about the one thing you think the other person is undeniably the best at.",
+  },
+  {
+    min: 5,
+    name: "Chaotic Duo",
+    emoji: "🎪",
+    verdict: "You've got very different opinions about yourselves, and we love it. At least one of you is wildly overrating themselves and you both know who.",
+    activity: "Tonight's assignment: do impressions of each other for 60 seconds each. Record it. Post it maybe.",
+  },
+  {
+    min: 0,
+    name: "Two Strangers",
+    emoji: "👀",
+    verdict: "The gap between how you see yourselves and how your partner sees you is... a conversation. A long one. With snacks.",
+    activity: "Tonight's assignment: sit across from each other, no phones, and ask: 'What do you think I think about you?'",
+  },
+];
+
+function getTier(n) { for(const t of RESULTS) { if(n >= t.min) return t; } return RESULTS[RESULTS.length-1]; }
+function encodeAnswers(a) { let s=''; for(let i=1;i<=15;i++) s+=(a[i]??0).toString(); return btoa(s).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_'); }
+function decodeAnswers(code) {
+  try {
+    let b = code.replace(/-/g,'+').replace(/_/g,'/');
+    while(b.length%4) b+='=';
+    const s = atob(b);
+    if(s.length !== 15) return null;
+    const a = {};
+    for(let i=0;i<15;i++) { const v=parseInt(s[i]); if(isNaN(v)||v<0||v>1) return null; a[i+1]=v; }
+    return a;
+  } catch(e) { return null; }
+}
+
+const SHARE_BASE_URL = 'https://www.buzzfeed.com/peggy/couples-honesty-quiz';
+function getShareURL(a) { return SHARE_BASE_URL+'?p='+encodeAnswers(a); }
+function getPartnerFromURL() { const p=new URLSearchParams(window.location.search).get('p'); return p?decodeAnswers(p):null; }
+
+let state = {screen:'home', currentQ:0, answers:{}, partnerAnswers:null, selectedOption:null};
+const partnerFromURL = getPartnerFromURL();
+if(partnerFromURL) { state.screen='home-b'; state.partnerAnswers=partnerFromURL; }
+
+const app = document.getElementById('app');
+
+function render() {
+  const s = state; let html = '';
+
+  if(s.screen === 'home') {
+    html = `<div class="screen visible">
+      <span class="eyebrow">🔍 Honesty Test</span>
+      <div class="stat-num">1 in 5</div>
+      <p class="stat-label">couples get a perfect score</p>
+      <h1>The Couples Honesty Test</h1>
+      <p class="subtitle">15 questions. Find out if your versions of each other actually match.</p>
+      <button class="btn-primary" onclick="startQuizA()">I'll go first →</button>
+      <button class="btn-secondary" onclick="goHome()">My partner already took it, where's the link?</button>
+    </div>`;
+  }
+
+  else if(s.screen === 'home-b') {
+    html = `<div class="screen visible">
+      <span class="eyebrow">🔍 Honesty Test</span>
+      <div class="stat-num">1 in 5</div>
+      <p class="stat-label">couples get a perfect score</p>
+      <h1>The Couples Honesty Test</h1>
+      <p class="subtitle">Your partner already answered. Now it's your turn — same 15 questions, no peeking.</p>
+      <button class="btn-primary" onclick="startQuizB()">I'm ready →</button>
+    </div>`;
+  }
+
+  else if(s.screen === 'quiz-a' || s.screen === 'quiz-b') {
+    const q = QUESTIONS[s.currentQ];
+    const who = s.screen === 'quiz-a' ? 'Partner A' : 'Partner B';
+    const pct = Math.round((s.currentQ / QUESTIONS.length) * 100);
+    const back = s.currentQ > 0 ? `<button class="btn-ghost" onclick="goBack()">← back</button>` : '';
+    html = `<div class="screen visible">
+      <div class="progress-wrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+        <div class="progress-label">${who} · ${s.currentQ+1} / ${QUESTIONS.length}</div>
+      </div>
+      <span class="q-emoji">${q.emoji}</span>
+      <div class="question-text">${q.q}</div>
+      <button class="answer-btn ${s.selectedOption===0?'selected':''}" onclick="selectAnswer(${q.id},0)">
+        <div class="answer-letter">A</div>
+        <div class="answer-btn-text">${q.a}</div>
+      </button>
+      <button class="answer-btn ${s.selectedOption===1?'selected':''}" onclick="selectAnswer(${q.id},1)">
+        <div class="answer-letter">B</div>
+        <div class="answer-btn-text">${q.b}</div>
+      </button>
+      ${back}
+    </div>`;
+  }
+
+  else if(s.screen === 'share') {
+    const url = getShareURL(s.answers);
+    html = `<div class="screen visible">
+      <span class="lock-icon">🔒</span>
+      <h1 style="font-size:26px;margin-bottom:10px">Your answers are locked in.</h1>
+      <p class="body-text">Now send this link to your partner. They answer the same 12 questions from their side. Neither of you sees the results until both are done. No cheating.</p>
+      <div class="share-card"><div class="share-url">${url}</div></div>
+      <button class="btn-primary" onclick="copyLink()">Copy link</button>
+      <button class="btn-ghost" onclick="resetQuiz()">Start over</button>
+    </div>`;
+  }
+
+  else if(s.screen === 'results') {
+    const my = s.answers, theirs = s.partnerAnswers;
+    let mc = 0;
+    const chips = QUESTIONS.map(q => {
+      const aligned = isAligned(my[q.id], theirs[q.id]);
+      if(aligned) mc++;
+      return `<div class="q-chip ${aligned?'agree':'disagree'}">${q.emoji} ${aligned?'✓':'✗'}</div>`;
+    }).join('');
+
+    const tier = getTier(mc);
+    const shareText = `We got "${tier.name}" (${mc}/15) on The Couples Honesty Test. Only 1 in 5 couples get a perfect score 👀`;
+
+    html = `<div class="screen visible">
+      <span class="result-badge">Honesty Test results</span>
+      <span class="result-emoji">${tier.emoji}</span>
+      <div class="result-name">${tier.name}</div>
+      <div class="result-score">You agreed on ${mc} out of 15</div>
+      <div class="activity-card">
+        <div class="activity-label">📋 Your couple assignment</div>
+        <div class="activity-text">${tier.activity}</div>
+      </div>
+      <p class="verdict-text">${tier.verdict}</p>
+      <div class="breakdown-label">Where you agreed ✓ and disagreed ✗</div>
+      <div class="q-result-grid">${chips}</div>
+      <div class="results-actions">
+        <button class="btn-primary" onclick="downloadResults()">Save your results</button>
+        <button class="btn-secondary" onclick="shareResult()">Share your score</button>
+        <button class="btn-ghost" onclick="resetQuiz()">Take it again →</button>
+      </div>
+    </div>`;
+    window._r = {mc, tier, chips, shareText};
+  }
+
+  else if(s.screen === 'no-link') {
+    html = `<div class="screen visible">
+      <span style="font-size:48px;display:block;margin-bottom:16px">🔗</span>
+      <h1 style="font-size:26px;margin-bottom:12px">You need a link from your partner.</h1>
+      <p class="body-text">Your partner goes first, answers 12 questions, and gets a special link to send you. Open that link to take the quiz and compare results.</p>
+      <button class="btn-primary" onclick="startQuizA()">I'll go first instead</button>
+      <button class="btn-ghost" onclick="goToHome()">← Back</button>
+    </div>`;
+  }
+
+  app.innerHTML = html;
+  requestAnimationFrame(() => {
+    const el = app.querySelector('.screen');
+    if(el) el.classList.add('visible');
+  });
+}
+
+function startQuizA() { state={screen:'quiz-a',currentQ:0,answers:{},partnerAnswers:null,selectedOption:null}; try{window.history.replaceState({},'',window.location.pathname);}catch(e){} render(); }
+function startQuizB() { state.screen='quiz-b'; state.currentQ=0; state.answers={}; state.selectedOption=null; render(); }
+function goHome() { if(partnerFromURL){state.screen='home-b';state.partnerAnswers=partnerFromURL;render();}else{state.screen='no-link';render();} }
+function goToHome() { state.screen='home'; render(); }
+function goBack() { if(state.currentQ>0){state.currentQ--;state.selectedOption=null;render();} }
+
+function selectAnswer(qid, oi) {
+  if(state.selectedOption !== null) return;
+  state.selectedOption = oi; state.answers[qid] = oi; render();
+  setTimeout(() => {
+    state.selectedOption = null;
+    if(state.currentQ < QUESTIONS.length-1) { state.currentQ++; render(); }
+    else {
+      if(state.screen === 'quiz-a') { state.screen='share'; render(); }
+      else if(state.screen === 'quiz-b') { state.screen='results'; try{window.history.replaceState({},'',window.location.pathname);}catch(e){} render(); }
+    }
+  }, 380);
+}
+
+async function tryCopy(text) {
+  try { if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);return true;} } catch(e){}
+  try { const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.focus();ta.select();const ok=document.execCommand('copy');document.body.removeChild(ta);if(ok)return true; } catch(e){}
+  return false;
+}
+
+async function copyLink() {
+  const url = getShareURL(state.answers);
+  try { if(navigator.share){await navigator.share({url});return;} } catch(e){}
+  const ok = await tryCopy(url);
+  const b = document.querySelector('.btn-primary');
+  if(b){b.textContent=ok?'Copied! ✓':'Select the link above and copy';setTimeout(()=>{b.textContent='Copy link';},2500);}
+}
+
+function resetQuiz() { state={screen:'home',currentQ:0,answers:{},partnerAnswers:null,selectedOption:null}; try{window.history.replaceState({},'',window.location.pathname);}catch(e){} render(); }
+
+async function shareResult() {
+  const r = window._r; if(!r) return;
+  const text = r.shareText+'\n'+SHARE_BASE_URL;
+  try { if(navigator.share){await navigator.share({text});return;} } catch(e){}
+  const ok = await tryCopy(text);
+  const b = document.querySelector('.btn-secondary');
+  if(b){b.textContent=ok?'Copied! ✓':'Long-press to copy';setTimeout(()=>{b.textContent='Share your score';},2500);}
+}
+
+function downloadResults() {
+  const r = window._r; if(!r) return;
+  const c = document.getElementById('results-canvas'), x = c.getContext('2d');
+  const W=1080, H=1350; c.width=W; c.height=H;
+
+  // Background
+  x.fillStyle='#FFFEF9'; x.fillRect(0,0,W,H);
+  // Yellow glow top-left
+  const g1=x.createRadialGradient(200,200,0,200,200,500);
+  g1.addColorStop(0,'rgba(255,230,0,0.3)'); g1.addColorStop(1,'transparent');
+  x.fillStyle=g1; x.fillRect(0,0,W,H);
+  // Pink glow bottom-right
+  const g2=x.createRadialGradient(900,1100,0,900,1100,600);
+  g2.addColorStop(0,'rgba(255,45,85,0.15)'); g2.addColorStop(1,'transparent');
+  x.fillStyle=g2; x.fillRect(0,0,W,H);
+
+  // Header label
+  x.fillStyle='#FFE600';
+  roundRect(x,W/2-130,60,260,44,22); x.fill();
+  x.fillStyle='#0D0D2B'; x.font='700 18px sans-serif'; x.textAlign='center';
+  x.fillText('🔍 THE COUPLES HONESTY TEST',W/2,88);
+
+  // Big emoji
+  x.font='120px serif'; x.textAlign='center'; x.fillText(r.tier.emoji,W/2,260);
+
+  // Tier name
+  x.fillStyle='#FF2D55'; x.font='italic 900 96px Georgia,serif'; x.fillText(r.tier.name,W/2,380);
+
+  // Score
+  x.fillStyle='#9494A8'; x.font='600 28px sans-serif'; x.fillText(r.mc+' of 15 agreed',W/2,430);
+
+  // Activity card
+  x.fillStyle='#0D0D2B'; roundRect(x,80,470,W-160,200,24); x.fill();
+  x.fillStyle='#FFE600'; x.font='700 18px sans-serif'; x.textAlign='left'; x.fillText('📋 YOUR COUPLE ASSIGNMENT',104,516);
+  x.fillStyle='white'; x.font='600 26px sans-serif'; wrapText(x,r.tier.activity,104,558,W-208,38);
+
+  // Question chips row
+  const chipW=60, chipH=52, chipGap=10;
+  const cols=6, rows=Math.ceil(12/cols);
+  const gridW=cols*(chipW+chipGap)-chipGap, gx=(W-gridW)/2;
+  let gy=710;
+  QUESTIONS.forEach((q,i)=>{
+    const col=i%cols, row=Math.floor(i/cols);
+    const cx=gx+col*(chipW+chipGap), cy=gy+row*(chipH+chipGap);
+    const aligned=isAligned(r.mc>0?state.answers[q.id]:0,0); // simplified - just show emojis
+    x.fillStyle=i<r.mc?'rgba(0,196,140,0.15)':'rgba(255,45,85,0.10)';
+    roundRect(x,cx,cy,chipW,chipH,10); x.fill();
+    x.strokeStyle=i<r.mc?'#00C48C':'rgba(255,45,85,0.4)'; x.lineWidth=2;
+    roundRect(x,cx,cy,chipW,chipH,10); x.stroke();
+    x.font='28px serif'; x.textAlign='center'; x.fillText(q.emoji,cx+chipW/2,cy+chipH/2+10);
+  });
+
+  // Verdict
+  x.fillStyle='#9494A8'; x.font='400 24px sans-serif'; x.textAlign='center';
+  wrapText(x,r.tier.verdict,80,gy+rows*(chipH+chipGap)+60,W-160,36);
+
+  // Footer
+  x.fillStyle='#C8C8D8'; x.font='400 20px sans-serif'; x.textAlign='center';
+  x.fillText('www.buzzfeed.com/peggy/couples-honesty-quiz',W/2,H-50);
+
+  c.toBlob(blob=>{
+    const u=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=u;a.download='who-quiz-'+r.tier.name.toLowerCase().replace(/\s+/g,'-')+'.png';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);
+  },'image/png');
+  const btn=document.querySelector('.btn-primary');
+  if(btn){btn.textContent='Saved! ✓';setTimeout(()=>{btn.textContent='Save your results';},2000);}
+}
+
+function roundRect(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.lineTo(a+w-r,b);x.quadraticCurveTo(a+w,b,a+w,b+r);x.lineTo(a+w,b+h-r);x.quadraticCurveTo(a+w,b+h,a+w-r,b+h);x.lineTo(a+r,b+h);x.quadraticCurveTo(a,b+h,a,b+h-r);x.lineTo(a,b+r);x.quadraticCurveTo(a,b,a+r,b);x.closePath();}
+function wrapText(x,t,a,b,mw,lh){const w=t.split(' ');let l='';for(let i=0;i<w.length;i++){const tl=l+w[i]+' ';if(x.measureText(tl).width>mw&&i>0){x.fillText(l.trim(),a,b);l=w[i]+' ';b+=lh;}else l=tl;}x.fillText(l.trim(),a,b);}
+
+render();
+function postHeight(){window.parent.postMessage({type:'resize',height:document.documentElement.scrollHeight},'*');}
+const _orig=render;render=function(){_orig();requestAnimationFrame(()=>setTimeout(postHeight,50));};
+window.addEventListener('load',()=>setTimeout(postHeight,100));
+new ResizeObserver(()=>postHeight()).observe(document.body);
+render();
+</script>
+</body>
+</html>
