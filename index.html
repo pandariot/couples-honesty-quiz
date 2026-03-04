@@ -325,11 +325,12 @@ h1 {
   color: white;
 }
 .verdict-text {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--muted);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--fg);
   line-height: 1.65;
   margin-bottom: 24px;
+  opacity: 0.8;
 }
 
 /* Q BREAKDOWN */
@@ -397,29 +398,25 @@ const RESULTS = [
     min: 13,
     name: "Twin Brains",
     emoji: "🧠",
-    verdict: "You see each other with freaky clarity. Either you're deeply in tune or you've had all these arguments before and both know who won.",
-    activity: "Tonight's assignment: make a TikTok doing this quiz out loud. React to each other's answers in real time.",
+    verdict: "Genuinely unsettling how in sync you are. You either know each other incredibly well or you've already had every single one of these arguments and both remember who won.",
   },
   {
     min: 9,
-    name: "Power Couple",
+    name: "Mostly Honest",
     emoji: "⚡",
-    verdict: "You know each other well. The places you didn't agree? Those are just the conversations you haven't had yet. Have them.",
-    activity: "Tonight's assignment: send each other a voice note about the one thing you think the other person is undeniably the best at.",
+    verdict: "You see each other pretty clearly — which is more than most couples can say. The questions you disagreed on? Those aren't problems. They're just the conversations you keep almost having.",
   },
   {
     min: 5,
-    name: "Chaotic Duo",
-    emoji: "🎪",
-    verdict: "You've got very different opinions about yourselves, and we love it. At least one of you is wildly overrating themselves and you both know who.",
-    activity: "Tonight's assignment: do impressions of each other for 60 seconds each. Record it. Post it maybe.",
+    name: "Selectively Honest",
+    emoji: "🙈",
+    verdict: "You've got very different ideas about who's who in this relationship. At least one of you is wildly overrating yourself right now. You both know who.",
   },
   {
     min: 0,
     name: "Two Strangers",
     emoji: "👀",
-    verdict: "The gap between how you see yourselves and how your partner sees you is... a conversation. A long one. With snacks.",
-    activity: "Tonight's assignment: sit across from each other, no phones, and ask: 'What do you think I think about you?'",
+    verdict: "The good news: you both showed up. The bad news: you're apparently in two completely different relationships. The interesting news: you found out here, not in couples therapy.",
   },
 ];
 
@@ -437,7 +434,7 @@ function decodeAnswers(code) {
   } catch(e) { return null; }
 }
 
-const SHARE_BASE_URL = 'https://www.buzzfeed.com/peggy/couples-honesty-quiz';
+const SHARE_BASE_URL = 'https://pandariot.github.io/couples-honesty-quiz/index.html';
 function getShareURL(a) { return SHARE_BASE_URL+'?p='+encodeAnswers(a); }
 function getPartnerFromURL() { const p=new URLSearchParams(window.location.search).get('p'); return p?decodeAnswers(p):null; }
 
@@ -526,10 +523,6 @@ function render() {
       <span class="result-emoji">${tier.emoji}</span>
       <div class="result-name">${tier.name}</div>
       <div class="result-score">You agreed on ${mc} out of 15</div>
-      <div class="activity-card">
-        <div class="activity-label">📋 Your couple assignment</div>
-        <div class="activity-text">${tier.activity}</div>
-      </div>
       <p class="verdict-text">${tier.verdict}</p>
       <div class="breakdown-label">Where you agreed ✓ and disagreed ✗</div>
       <div class="q-result-grid">${chips}</div>
