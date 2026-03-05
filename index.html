@@ -6,7 +6,7 @@
 <title>The Couples Honesty Test</title>
 <meta name="description" content="Who's messier? Who's funnier? Who's hotter? You both answer. Then find out if your versions of each other actually match.">
 <meta property="og:title" content="The Couples Honesty Test">
-<meta property="og:description" content="12 questions. Two answers. One uncomfortable truth.">
+<meta property="og:description" content="15 questions. Two answers. One uncomfortable truth.">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -434,7 +434,8 @@ function decodeAnswers(code) {
   } catch(e) { return null; }
 }
 
-const SHARE_BASE_URL = 'https://pandariot.github.io/couples-honesty-quiz/index.html';
+const SHARE_BASE_URL = 'https://www.buzzfeed.com/peggy/couples-honesty-quiz';
+const SHARE_DISPLAY_URL = 'www.buzzfeed.com/peggy/couples-honesty-quiz';
 function getShareURL(a) { return SHARE_BASE_URL+'?p='+encodeAnswers(a); }
 function getPartnerFromURL() { const p=new URLSearchParams(window.location.search).get('p'); return p?decodeAnswers(p):null; }
 
@@ -499,7 +500,7 @@ function render() {
     html = `<div class="screen visible">
       <span class="lock-icon">🔒</span>
       <h1 style="font-size:26px;margin-bottom:10px">Your answers are locked in.</h1>
-      <p class="body-text">Now send this link to your partner. They answer the same 12 questions from their side. Neither of you sees the results until both are done. No cheating.</p>
+      <p class="body-text">Now send this link to your partner. They answer the same 15 questions from their side. Neither of you sees the results until both are done. No cheating.</p>
       <div class="share-card"><div class="share-url">${url}</div></div>
       <button class="btn-primary" onclick="copyLink()">Copy link</button>
       <button class="btn-ghost" onclick="resetQuiz()">Start over</button>
@@ -539,7 +540,7 @@ function render() {
     html = `<div class="screen visible">
       <span style="font-size:48px;display:block;margin-bottom:16px">🔗</span>
       <h1 style="font-size:26px;margin-bottom:12px">You need a link from your partner.</h1>
-      <p class="body-text">Your partner goes first, answers 12 questions, and gets a special link to send you. Open that link to take the quiz and compare results.</p>
+      <p class="body-text">Your partner goes first, answers 15 questions, and gets a special link to send you. Open that link to take the quiz and compare results.</p>
       <button class="btn-primary" onclick="startQuizA()">I'll go first instead</button>
       <button class="btn-ghost" onclick="goToHome()">← Back</button>
     </div>`;
@@ -654,7 +655,7 @@ function downloadResults() {
 
   // Footer
   x.fillStyle='#C8C8D8'; x.font='400 20px sans-serif'; x.textAlign='center';
-  x.fillText('www.buzzfeed.com/peggy/couples-honesty-quiz',W/2,H-50);
+  x.fillText(SHARE_DISPLAY_URL,W/2,H-50);
 
   c.toBlob(blob=>{
     const u=URL.createObjectURL(blob),a=document.createElement('a');
