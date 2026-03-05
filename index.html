@@ -402,9 +402,9 @@ const RESULTS = [
   },
   {
     min: 9,
-    name: "Mostly Honest",
+    name: "Close Enough",
     emoji: "⚡",
-    verdict: "You see each other pretty clearly — which is more than most couples can say. The questions you disagreed on? Those aren't problems. They're just the conversations you keep almost having.",
+    verdict: "You're not delusional about each other, which is rarer than it sounds. The gaps are small — but they're specific, and you both know exactly which ones they are.",
   },
   {
     min: 5,
@@ -533,7 +533,9 @@ function render() {
         <button class="btn-ghost" onclick="resetQuiz()">Take it again →</button>
       </div>
     </div>`;
-    window._r = {mc, tier, chips, shareText};
+    const alignMap = {};
+    QUESTIONS.forEach(q => { alignMap[q.id] = isAligned(my[q.id], theirs[q.id]); });
+    window._r = {mc, tier, shareText, alignMap};
   }
 
   else if(s.screen === 'no-link') {
@@ -600,69 +602,93 @@ async function shareResult() {
 function downloadResults() {
   const r = window._r; if(!r) return;
   const c = document.getElementById('results-canvas'), x = c.getContext('2d');
-  const W=1080, H=1350; c.width=W; c.height=H;
+  const W=1080, H=1440; c.width=W; c.height=H;
 
   // Background
   x.fillStyle='#FFFEF9'; x.fillRect(0,0,W,H);
   // Yellow glow top-left
-  const g1=x.createRadialGradient(200,200,0,200,200,500);
-  g1.addColorStop(0,'rgba(255,230,0,0.3)'); g1.addColorStop(1,'transparent');
+  const g1=x.createRadialGradient(160,160,0,160,160,520);
+  g1.addColorStop(0,'rgba(255,230,0,0.28)'); g1.addColorStop(1,'transparent');
   x.fillStyle=g1; x.fillRect(0,0,W,H);
   // Pink glow bottom-right
-  const g2=x.createRadialGradient(900,1100,0,900,1100,600);
-  g2.addColorStop(0,'rgba(255,45,85,0.15)'); g2.addColorStop(1,'transparent');
+  const g2=x.createRadialGradient(920,1280,0,920,1280,600);
+  g2.addColorStop(0,'rgba(255,45,85,0.13)'); g2.addColorStop(1,'transparent');
   x.fillStyle=g2; x.fillRect(0,0,W,H);
 
-  // Header label
-  x.fillStyle='#FFE600';
-  roundRect(x,W/2-130,60,260,44,22); x.fill();
-  x.fillStyle='#0D0D2B'; x.font='700 18px sans-serif'; x.textAlign='center';
-  x.fillText('🔍 THE COUPLES HONESTY TEST',W/2,88);
+  // Eyebrow pill
+  const eyebrowText = '🔍  THE COUPLES HONESTY TEST';
+  x.font = 'bold 22px sans-serif';
+  const eyebrowW = x.measureText(eyebrowText).width + 48;
+  x.fillStyle = '#FFE600';
+  roundRect(x, W/2-eyebrowW/2, 64, eyebrowW, 52, 26); x.fill();
+  x.fillStyle = '#0D0D2B'; x.textAlign = 'center';
+  x.fillText(eyebrowText, W/2, 98);
 
   // Big emoji
-  x.font='120px serif'; x.textAlign='center'; x.fillText(r.tier.emoji,W/2,260);
+  x.font = '130px serif'; x.textAlign = 'center';
+  x.fillText(r.tier.emoji, W/2, 260);
 
   // Tier name
-  x.fillStyle='#FF2D55'; x.font='italic 900 96px Georgia,serif'; x.fillText(r.tier.name,W/2,380);
+  x.fillStyle = '#FF2D55';
+  x.font = 'italic 900 108px Georgia, serif';
+  x.textAlign = 'center';
+  x.fillText(r.tier.name, W/2, 390);
 
   // Score
-  x.fillStyle='#9494A8'; x.font='600 28px sans-serif'; x.fillText(r.mc+' of 15 agreed',W/2,430);
+  x.fillStyle = '#9494A8';
+  x.font = '600 30px sans-serif';
+  x.fillText(r.mc + ' of 15 agreed', W/2, 444);
 
   // Verdict card
-  x.fillStyle='#0D0D2B'; roundRect(x,80,470,W-160,220,24); x.fill();
-  x.fillStyle='white'; x.font='600 26px sans-serif'; x.textAlign='left'; wrapText(x,r.tier.verdict,104,520,W-208,40);
+  const cardX = 72, cardY = 490, cardW = W-144, cardH = 240;
+  x.fillStyle = '#0D0D2B';
+  roundRect(x, cardX, cardY, cardW, cardH, 28); x.fill();
+  x.fillStyle = 'white';
+  x.font = '600 28px sans-serif';
+  x.textAlign = 'left';
+  wrapText(x, r.tier.verdict, cardX+36, cardY+56, cardW-72, 44);
 
-  // Question chips row
-  const chipW=60, chipH=52, chipGap=10;
-  const cols=5, rows=Math.ceil(15/cols);
-  const gridW=cols*(chipW+chipGap)-chipGap, gx=(W-gridW)/2;
-  let gy=730;
-  QUESTIONS.forEach((q,i)=>{
-    const col=i%cols, row=Math.floor(i/cols);
-    const cx=gx+col*(chipW+chipGap), cy=gy+row*(chipH+chipGap);
-    const aligned=isAligned(r.mc>0?state.answers[q.id]:0,0); // simplified - just show emojis
-    x.fillStyle=i<r.mc?'rgba(0,196,140,0.15)':'rgba(255,45,85,0.10)';
-    roundRect(x,cx,cy,chipW,chipH,10); x.fill();
-    x.strokeStyle=i<r.mc?'#00C48C':'rgba(255,45,85,0.4)'; x.lineWidth=2;
-    roundRect(x,cx,cy,chipW,chipH,10); x.stroke();
-    x.font='28px serif'; x.textAlign='center'; x.fillText(q.emoji,cx+chipW/2,cy+chipH/2+10);
+  // Chips grid
+  const chipW=88, chipH=72, chipGap=12;
+  const cols=5;
+  const gridW = cols*(chipW+chipGap)-chipGap;
+  const gridX = (W-gridW)/2;
+  let gridY = 772;
+
+  QUESTIONS.forEach((q,i) => {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const cx = gridX + col*(chipW+chipGap);
+    const cy = gridY + row*(chipH+chipGap);
+    const agreed = isAligned(r.alignMap[q.id] ? 1 : 0, 0);
+    const isMatch = r.alignMap[q.id];
+
+    x.fillStyle = isMatch ? 'rgba(0,196,140,0.15)' : 'rgba(255,45,85,0.10)';
+    roundRect(x, cx, cy, chipW, chipH, 12); x.fill();
+    x.strokeStyle = isMatch ? '#00C48C' : 'rgba(255,45,85,0.4)';
+    x.lineWidth = 2.5;
+    roundRect(x, cx, cy, chipW, chipH, 12); x.stroke();
+    x.font = '36px serif';
+    x.textAlign = 'center';
+    x.fillText(q.emoji, cx+chipW/2, cy+chipH/2+13);
   });
 
-  // Verdict
-  x.fillStyle='#9494A8'; x.font='400 24px sans-serif'; x.textAlign='center';
-  wrapText(x,r.tier.verdict,80,gy+rows*(chipH+chipGap)+60,W-160,36);
+  const rows = Math.ceil(15/cols);
+  const chipsBottom = gridY + rows*(chipH+chipGap);
 
-  // Footer
-  x.fillStyle='#C8C8D8'; x.font='400 20px sans-serif'; x.textAlign='center';
-  x.fillText(SHARE_DISPLAY_URL,W/2,H-50);
+  // Footer URL
+  x.fillStyle = '#C8C8D8';
+  x.font = '400 24px sans-serif';
+  x.textAlign = 'center';
+  x.fillText(SHARE_DISPLAY_URL, W/2, chipsBottom + 80);
 
-  c.toBlob(blob=>{
-    const u=URL.createObjectURL(blob),a=document.createElement('a');
-    a.href=u;a.download='who-quiz-'+r.tier.name.toLowerCase().replace(/\s+/g,'-')+'.png';
-    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);
-  },'image/png');
-  const btn=document.querySelector('.btn-primary');
-  if(btn){btn.textContent='Saved! ✓';setTimeout(()=>{btn.textContent='Save your results';},2000);}
+  c.toBlob(blob => {
+    const u = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = u; a.download = 'couples-honesty-test-' + r.tier.name.toLowerCase().replace(/\s+/g,'-') + '.png';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(u);
+  }, 'image/png');
+  const btn = document.querySelector('.btn-primary');
+  if(btn){btn.textContent='Saved! ✓'; setTimeout(()=>{btn.textContent='Save your results';},2000);}
 }
 
 function roundRect(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.lineTo(a+w-r,b);x.quadraticCurveTo(a+w,b,a+w,b+r);x.lineTo(a+w,b+h-r);x.quadraticCurveTo(a+w,b+h,a+w-r,b+h);x.lineTo(a+r,b+h);x.quadraticCurveTo(a,b+h,a,b+h-r);x.lineTo(a,b+r);x.quadraticCurveTo(a,b,a+r,b);x.closePath();}
