@@ -628,16 +628,15 @@ function downloadResults() {
   // Score
   x.fillStyle='#9494A8'; x.font='600 28px sans-serif'; x.fillText(r.mc+' of 15 agreed',W/2,430);
 
-  // Activity card
-  x.fillStyle='#0D0D2B'; roundRect(x,80,470,W-160,200,24); x.fill();
-  x.fillStyle='#FFE600'; x.font='700 18px sans-serif'; x.textAlign='left'; x.fillText('📋 YOUR COUPLE ASSIGNMENT',104,516);
-  x.fillStyle='white'; x.font='600 26px sans-serif'; wrapText(x,r.tier.activity,104,558,W-208,38);
+  // Verdict card
+  x.fillStyle='#0D0D2B'; roundRect(x,80,470,W-160,220,24); x.fill();
+  x.fillStyle='white'; x.font='600 26px sans-serif'; x.textAlign='left'; wrapText(x,r.tier.verdict,104,520,W-208,40);
 
   // Question chips row
   const chipW=60, chipH=52, chipGap=10;
-  const cols=6, rows=Math.ceil(12/cols);
+  const cols=5, rows=Math.ceil(15/cols);
   const gridW=cols*(chipW+chipGap)-chipGap, gx=(W-gridW)/2;
-  let gy=710;
+  let gy=730;
   QUESTIONS.forEach((q,i)=>{
     const col=i%cols, row=Math.floor(i/cols);
     const cx=gx+col*(chipW+chipGap), cy=gy+row*(chipH+chipGap);
