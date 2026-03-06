@@ -592,9 +592,9 @@ function resetQuiz() { state={screen:'home',currentQ:0,answers:{},partnerAnswers
 
 async function shareResult() {
   const r = window._r; if(!r) return;
-  const text = r.shareText+'\n'+SHARE_BASE_URL;
-  try { if(navigator.share){await navigator.share({text});return;} } catch(e){}
-  const ok = await tryCopy(text);
+  const text = r.shareText;
+  try { if(navigator.share){await navigator.share({text, url: SHARE_BASE_URL});return;} } catch(e){}
+  const ok = await tryCopy(text+'\n'+SHARE_BASE_URL);
   const b = document.querySelector('.btn-secondary');
   if(b){b.textContent=ok?'Copied! ✓':'Long-press to copy';setTimeout(()=>{b.textContent='Share your score';},2500);}
 }
@@ -682,13 +682,24 @@ function downloadResults() {
   x.textAlign = 'center';
   x.fillText(SHARE_DISPLAY_URL, W/2, chipsBottom + 80);
 
-  c.toBlob(blob => {
+  c.toBlob(async blob => {
+    const fname = 'couples-honesty-test-' + r.tier.name.toLowerCase().replace(/\s+/g,'-') + '.png';
+    const file = new File([blob], fname, {type: 'image/png'});
+    const btn = document.querySelector('.btn-primary');
+    // Mobile: native share sheet with image file
+    if(navigator.canShare && navigator.canShare({files:[file]})) {
+      try {
+        await navigator.share({files:[file], title:'My Honesty Test Results'});
+        if(btn){btn.textContent='Shared! ✓'; setTimeout(()=>{btn.textContent='Save your results';},2500);}
+        return;
+      } catch(e) { if(e.name === 'AbortError') return; }
+    }
+    // Desktop fallback: direct download
     const u = URL.createObjectURL(blob), a = document.createElement('a');
-    a.href = u; a.download = 'couples-honesty-test-' + r.tier.name.toLowerCase().replace(/\s+/g,'-') + '.png';
+    a.href = u; a.download = fname;
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(u);
+    if(btn){btn.textContent='Saved! ✓'; setTimeout(()=>{btn.textContent='Save your results';},2000);}
   }, 'image/png');
-  const btn = document.querySelector('.btn-primary');
-  if(btn){btn.textContent='Saved! ✓'; setTimeout(()=>{btn.textContent='Save your results';},2000);}
 }
 
 function roundRect(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.lineTo(a+w-r,b);x.quadraticCurveTo(a+w,b,a+w,b+r);x.lineTo(a+w,b+h-r);x.quadraticCurveTo(a+w,b+h,a+w-r,b+h);x.lineTo(a+r,b+h);x.quadraticCurveTo(a,b+h,a,b+h-r);x.lineTo(a,b+r);x.quadraticCurveTo(a,b,a+r,b);x.closePath();}
